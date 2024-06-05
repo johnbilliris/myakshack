@@ -1,4 +1,4 @@
-. env.sh
+sh env.sh
 zone=`printf "$LAB_REGION-%s__" {1..3}`
 zone="${zone%__}"
 echo "using zone $zone"

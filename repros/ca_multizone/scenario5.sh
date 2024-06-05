@@ -1,4 +1,4 @@
-. env.sh
+sh env.sh
 zone="$LAB_REGION-1"
 echo "using zone $zone"
 

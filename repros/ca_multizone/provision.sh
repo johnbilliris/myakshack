@@ -22,8 +22,10 @@ if [ ! -f env.sh ]; then
     makeenv
     saveenv
 else
-    . env.sh
+    . ./env.sh
 fi
+
+export MSYS_NO_PATHCONV=1
 set -x
 az group create -l "$LAB_REGION" -n "$LAB_RG"
 
@@ -33,9 +35,9 @@ az network vnet create -g "$LAB_RG" -n "$LAB_VNET_NAME" \
 
 AKS_SUBNET_ID=$(az network vnet subnet show \
   -g "$LAB_RG" --vnet-name "$LAB_VNET_NAME" -n "aks" \
-  --query "id" -otsv)
+  --query "id" -o tsv)
 
-if az aks show -g "$LAB_RG" -n "$LAB_AKSNAME" --query 'id' -otsv; then
+if az aks show -g "$LAB_RG" -n "$LAB_AKSNAME" --query 'id' -o tsv; then
     echo "AKS cluster already created"
 elif [[ $? == 3 ]]; then
     set -e
@@ -45,7 +47,7 @@ elif [[ $? == 3 ]]; then
         --vnet-subnet-id "$AKS_SUBNET_ID" \
         --zones 1 2 3 \
         -s "$LAB_NODE_SIZE" \
-        --query 'id' -otsv
+        --query 'id' -o tsv
         # --cluster-autoscaler-profile "balance-similar-node-groups=true" \
     set +e
 else
@@ -62,7 +64,7 @@ elif [[ $? == 3 ]]; then
         --enable-cluster-autoscaler --zones 1 2 3 \
         -n "multizone1" -c 1 --min-count 1 --max-count 20 -s "$LAB_NODE_SIZE" \
         --labels "lab_ca=multizone1" \
-        --query 'id' -otsv
+        --query 'id' -o tsv
     set +e
 else
     echo "failed listing nodepool multizone1" && exit 1
@@ -70,7 +72,7 @@ fi
 
 # we provision a multizone nodepool
 if az aks nodepool show -g "$LAB_RG" --cluster-name "$LAB_AKSNAME" \
-    -n "multizone0" --query 'id' -otsv; then
+    -n "multizone0" --query 'id' -o tsv; then
     echo "multizone0 nodepool already created"
 elif [[ $? == 3 ]]; then
     set -e
@@ -78,14 +80,14 @@ elif [[ $? == 3 ]]; then
         --enable-cluster-autoscaler --zones 1 2 3 \
         -n "multizone0" -c 0 --min-count 0 --max-count 20 -s "$LAB_NODE_SIZE" \
         --labels "lab_ca=multizone0" \
-        --query 'id' -otsv
+        --query 'id' -o tsv
     set +e
 else
     echo "failed listing nodepool multizone0" && exit 1
 fi
 
 if az aks nodepool show -g "$LAB_RG" --cluster-name "$LAB_AKSNAME" \
-    -n "singlezone0" --query 'id' -otsv; then
+    -n "singlezone0" --query 'id' -o tsv; then
     echo "singlezone0 nodepool already created"
 elif [[ $? == 3 ]]; then
     set -e
@@ -93,7 +95,7 @@ elif [[ $? == 3 ]]; then
         --enable-cluster-autoscaler --zones 1 \
         -n "singlezone0" -c 0 --min-count 0 --max-count 20 -s "$LAB_NODE_SIZE" \
         --labels "lab_ca=singlezone0" \
-        --query 'id' -otsv
+        --query 'id' -o tsv
     set +e
 else
     echo "failed listing nodepool singlezone0" && exit 1

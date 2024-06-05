@@ -1,4 +1,4 @@
-. env.sh
+sh env.sh
 zone=$(comm -23 \
   <(printf "$LAB_REGION-%s\n" {1..3})\
   <(kubectl get node -l "lab_ca=multizone1" -ojson | jq -r '.items[].metadata.labels["topology.kubernetes.io/zone"]' | sort | uniq)\
