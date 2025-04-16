@@ -1,0 +1,8 @@
+Provisioning succeeded!
+
+To access the lab environment:
+
+```
+. "$SCRIPTDIR/env.sh"
+export KUBECONFIG="$LAB_KUBECONFIG"
+```

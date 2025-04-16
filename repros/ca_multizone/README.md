@@ -7,9 +7,7 @@ have kubectl access to the created cluster.
 For each of the test scenario, remove previous test deployments and wait for
 sufficient time for cluster-autoscaler to recover.
 
-Execute in VSCode in a bash terminal.
-
-Tested May 2024
+Tested January 2024, March 2025
 
 ## Test Scenarios
 
@@ -35,10 +33,7 @@ If running on the same cluster as scenario 1, make sure to delete the deployment
 
 Result: None of the pods get scheduled. Scale-up not triggered.
 
-Clean up: 
-- kubectl delete deployment scenario2
-
-### scenario 3: multizone nodepool, 0 starting node, scale up with zone 1
+### scenario 3: multizone nodepool, 0 starting node, scale up with first zone
 
 On a new provisioned cluster, run [scenario3.sh](./scenario3.sh)\
 If running on the same cluster as scenario 1, make sure to delete the deployment from scenario 1 first and wait approx. 30 minutes for the scale down to complete.
@@ -56,11 +51,13 @@ Key Commands:
 Clean up: 
 - kubectl delete deployment scenario3
 
-### scenario 4: multizone nodepool, 0 starting node, scale up with zone=<region>-1__<region->2__<region>-3
+### scenario 4: multizone nodepool, 0 starting node, scale up with `zone=<region>-1__<region->2__<region>-3`
 
 On a new provisioned cluster, run [scenario4.sh](./scenario4.sh)
 
-Result: **Scale-up triggered** once. None of the pods get scheduled.
+~~Result: **Scale-up triggered** once. None of the pods get scheduled.~~
+
+**UPDATE March 2025** Result: No scale up.
 
 Key Commands:
 - kubectl get pods -o wide
@@ -112,6 +109,10 @@ When scaling up from 0 nodes,
 [the cloud provider is consulted](https://github.com/kubernetes/autoscaler/blob/a2f890247b01a7dd621f3c86642d4e1cfe4d4f40/cluster-autoscaler/processors/nodeinfosprovider/mixed_nodeinfos_processor.go#L155)
 to generate a template.
 
-For Azure, see [here](https://github.com/kubernetes/autoscaler/blob/a2f890247b01a7dd621f3c86642d4e1cfe4d4f40/cluster-autoscaler/cloudprovider/azure/azure_template.go#L65)
+~~For Azure, see [here](https://github.com/kubernetes/autoscaler/blob/a2f890247b01a7dd621f3c86642d4e1cfe4d4f40/cluster-autoscaler/cloudprovider/azure/azure_template.go#L65)
 on how zones are joined together in the template, which causes strange behavior
-in scenario 3 and scenario 4, but works fine for scenario 5. 
+in scenario 3 and scenario 4, but works fine for scenario 5.~~
+
+**UPDATE March 2025**: The behavior of multiple zone nodepool scale up has since
+changed to random zone choice.
+https://github.com/kubernetes/autoscaler/pull/7013

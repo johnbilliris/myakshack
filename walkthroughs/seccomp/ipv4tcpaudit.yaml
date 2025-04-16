@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ipv4tcpaudit
+  labels:
+    app: ipv4tcpaudit
+spec:
+  nodeSelector:
+    kubernetes.io/os: linux
+  terminationGracePeriodSeconds: 1
+  securityContext:
+    seccompProfile:
+      type: Localhost
+      localhostProfile: profiles/ipv4tcpaudit.json
+  containers:
+  - name: test-container
+    image: alpine
+    command:
+    - sleep
+    - inf
