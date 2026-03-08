@@ -230,6 +230,9 @@ labenv_cleanup() {
     set -x
     [ -f "$SCRIPTDIR/env.sh" ] || { echo "env.sh not found, nothing to cleanup" >&2; return 1; }
     . "$SCRIPTDIR/env.sh"
+    declare -f -F cleanup >/dev/null && {
+        cleanup "$@"
+    }
     [ -z "$LAB_RG" ] && { echo "LAB_RG not set in env.sh, aborting cleanup" >&2; return 1; }
     az group delete -n "$LAB_RG"
     rm -i "$SCRIPTDIR/env.sh"
